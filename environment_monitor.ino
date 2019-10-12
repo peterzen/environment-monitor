@@ -3,27 +3,17 @@
 
 
 // DHT Settings
-#define DHTPIN 2     // what digital pin we're connected to. If you are not using NodeMCU change D6 to real pin
+#define DHT_OUTDOOR_PIN 0     // outdoor DHT sensor pin
+#define DHT_INDOOR_PIN 2      // indoor DHT sensor pin
 #define DHTTYPE DHT21   // DHT 21 (AM2301)
 
 // Update every 30 seconds = 0,5 minutes. Min with Thingspeak is ~20 seconds
 const int UPDATE_INTERVAL_SECONDS = 60;
 
-DHTesp dht_indoor;
+DHTesp dht_indoor, dht_outdoor;
 
 
 // BH1750 light sensor
-/*
-  This is a simple example to test the BH1750 Light sensor
-  
-  Connect the sensor to a NodeMCU ESP8266:
-  VCC  <-> 3V3 [grey]
-  GND  <-> Gnd [purple]
-  SDA  <-> D2  [green]
-  SCL  <-> D1  [blue]
-  ADDR <-> RX  [yellow]
- */
-
 #include <Wire.h>
 #include <BH1750FVI.h>
 
@@ -52,7 +42,8 @@ void setup() {
 
   networkSetup();
 
-  dht_indoor.setup(2, DHTesp::DHT22); // Connect DHT sensor to GPIO 17
+  dht_outdoor.setup(DHT_OUTDOOR_PIN, DHTesp::DHT22);
+  dht_indoor.setup(DHT_INDOOR_PIN, DHTesp::DHT22);
 
   LightSensor.begin();  
 
@@ -74,25 +65,38 @@ void loop() {
     float temperature_indoor = dht_indoor.getTemperature();
 
     if (isnan(humidity_indoor) || isnan(temperature_indoor)) {
-      Serial.println("Can't receive data from DHT");
+      Serial.println("Can't receive data from indoor DHT");
       delay(10);
       return;
     }
 
-    sendData(temperature_indoor, humidity_indoor, lux);
-    
+    float humidity_outdoor = dht_outdoor.getHumidity();
+    float temperature_outdoor = dht_outdoor.getTemperature();
+
+    if (isnan(humidity_outdoor) || isnan(temperature_outdoor)) {
+      Serial.println("Can't receive data from outdoor DHT");
+      delay(10);
+      return;
+    }
+
+    sendData(temperature_indoor, humidity_indoor, temperature_outdoor, humidity_outdoor, lux);
     
     Serial.println();
-    Serial.print("Temperature: ");
+    Serial.print("Indoor temp: ");
     Serial.print(temperature_indoor);
-    Serial.print("C Humidity: "); 
+    Serial.print("C Indoor humidity: "); 
     Serial.print(humidity_indoor);
     Serial.print("% "); 
     
+    Serial.print("Outdoor temp: ");
+    Serial.print(temperature_outdoor);
+    Serial.print("C Outdoor humidity: "); 
+    Serial.print(humidity_outdoor);
+    Serial.print("% "); 
+
     Serial.print("Light: ");
     Serial.print(lux);
     Serial.print(" lux");
-
 
     LEDOff();
 
