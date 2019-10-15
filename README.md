@@ -1,6 +1,6 @@
 # Environment monitor and logger
 
-Arduino sketch that captures temperature, humidity and light intensity data and sends the values to a [ThingSpeak channel](https://thingspeak.com/channels/878017).
+Arduino sketch that captures temperature, humidity and light intensity data and sends the values to [Thingsboard](https://thingsboard.io/) using MQTT.
 
 Sensors:
   * 2x DHT21 (AM2301) temperature/humidity, indoor and outdoor.
@@ -9,3 +9,10 @@ Sensors:
 It runs on a NodeMCU v3 (ESP8266 12E) board.
 
 Measurements are taken once every minute.
+
+### Dependencies:
+
+ * ArduinoJSON
+ * WiFiManager
+ * ThingsBoard
+

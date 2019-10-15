@@ -5,7 +5,7 @@
 // DHT Settings
 #define DHT_OUTDOOR_PIN 0     // outdoor DHT sensor pin
 #define DHT_INDOOR_PIN 2      // indoor DHT sensor pin
-#define DHTTYPE DHT21   // DHT 21 (AM2301)
+#define DHTTYPE DHT21         // DHT 21 (AM2301)
 
 // Update every 30 seconds = 0,5 minutes. Min with Thingspeak is ~20 seconds
 const int UPDATE_INTERVAL_SECONDS = 60;
@@ -24,7 +24,6 @@ BH1750FVI::eDeviceMode_t DEVICEMODE = BH1750FVI::k_DevModeContHighRes;
 
 // Create the Lightsensor instance
 BH1750FVI LightSensor(ADDRESSPIN, DEVICEADDRESS, DEVICEMODE);
-
 
 
 void LEDOn(){
@@ -53,20 +52,16 @@ void setup() {
 
 void loop() {      
 
-    if(clientConnect() != true){
-      return;
-    }
-
     LEDOn();
 
     uint16_t lux = LightSensor.GetLightIntensity();
-    
+ 
     float humidity_indoor = dht_indoor.getHumidity();
     float temperature_indoor = dht_indoor.getTemperature();
 
     if (isnan(humidity_indoor) || isnan(temperature_indoor)) {
       Serial.println("Can't receive data from indoor DHT");
-      delay(10);
+      delay(1000);
       return;
     }
 
@@ -81,7 +76,6 @@ void loop() {
 
     sendData(temperature_indoor, humidity_indoor, temperature_outdoor, humidity_outdoor, lux);
     
-    Serial.println();
     Serial.print("Indoor temp: ");
     Serial.print(temperature_indoor);
     Serial.print("C Indoor humidity: "); 
@@ -97,6 +91,7 @@ void loop() {
     Serial.print("Light: ");
     Serial.print(lux);
     Serial.print(" lux");
+    Serial.println();
 
     LEDOff();
 
